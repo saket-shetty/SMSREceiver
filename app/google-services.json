@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1094610381113",
+    "firebase_url": "https://clgproject-6d558.firebaseio.com",
+    "project_id": "clgproject-6d558",
+    "storage_bucket": "clgproject-6d558.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1094610381113:android:f58eb99e92a436a0",
+        "android_client_info": {
+          "package_name": "com.example.raghav.smsreceiver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1094610381113-9m0rarn3v0mrbt4ajclevnu3emsbhq47.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.raghav.smsreceiver",
+            "certificate_hash": "ae4c40e05609f3a9e46a5484abd76d88300ee37f"
+          }
+        },
+        {
+          "client_id": "1094610381113-40jjn107tpgfnqoall1s3paoekusf8e2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvI_FxSRuSybcYc_2BEteKdGJiZWtoc7w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1094610381113-40jjn107tpgfnqoall1s3paoekusf8e2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
