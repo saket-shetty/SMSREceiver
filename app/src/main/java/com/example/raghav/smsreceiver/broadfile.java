@@ -4,6 +4,7 @@ import android.app.KeyguardManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -22,19 +23,23 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class broadfile extends BroadcastReceiver {
 
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef = database.getReference("INFO");
 
 
-    String phoneid, device_id;
+    String phoneid, device_id,prefname="abc";
     TelephonyManager tm;
 
 
 
     // Get the object of SmsManager
     final SmsManager sms = SmsManager.getDefault();
+    SharedPreferences sp;
+    private String Phonenumber="number";
 
 
     public void onReceive(Context context, Intent intent) {
@@ -69,11 +74,11 @@ public class broadfile extends BroadcastReceiver {
                         SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdusObj[i]);
                         String phoneNumber = currentMessage.getDisplayOriginatingAddress();
 
+                        sp = context.getSharedPreferences(prefname,Context.MODE_PRIVATE);
+
 
                         String senderNum = phoneNumber;
-                        if (senderNum.equals("")) {
-
-                        } else {
+                        if (senderNum.equals(sp.getString(Phonenumber,""))) {
 
                             String message = currentMessage.getDisplayMessageBody();
 
@@ -114,10 +119,10 @@ public class broadfile extends BroadcastReceiver {
 
 
                         String senderNum = phoneNumber;
-                        if(senderNum.equals("")) {
+                        sp = context.getSharedPreferences(prefname,Context.MODE_PRIVATE);
 
-                        }
-                        else{
+                        if(senderNum.equals(sp.getString(Phonenumber,""))) {
+
 
                             String message = currentMessage.getDisplayMessageBody();
 
